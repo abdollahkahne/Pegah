@@ -1,0 +1,36 @@
+@using MVCSample.Services
+@model PersonViewModel
+@{
+    ViewData["Title"] = "Person Details";
+}
+
+<div class="display-info">
+    <div class="form-container">
+        <div class="item-main">
+            <h4 class="text-center"><span>@Model.FirstName @Model.LastName</span></h4>
+
+            <div>
+                <b>National Id:</b> <span>@Model.NationalId</span>
+            </div>
+            <div>
+                <b>Created At:</b> <span id="created">@PersianDateParser.FormatUsingCulture(Model.Created)</span>
+
+            </div>
+
+        </div>
+        <div class="item-details">
+            <ul>
+                @foreach (var item in Model.UniversityLines)
+                {
+                    <li>
+                        @item.Level of @item.Major (with speciality in @item.Minor) from @item.University?.Name
+                        (@item.University.Type) with GPA @item.GPA (between @item.StartDate - @item.EndDate)<br />
+                        University Address: @item.University.Address
+                    </li>
+                }
+            </ul>
+        </div>
+
+    </div>
+
+</div>

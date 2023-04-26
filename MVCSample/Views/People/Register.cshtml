@@ -1,0 +1,293 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Localization
+@inject IViewLocalizer _localizer
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using MVCSample.Data
+@{
+  ViewData["Title"] = _localizer["Register New User"];
+}
+
+<h1>@ViewData["Title"]</h1>
+<div class="card p-3 bg-light">
+  <form action="" method="post">
+    <div class="form-group">
+      <label for="fname">@_localizer["First Name"]</label>
+      <input type="text" class="form-control" id="fname" required>
+    </div>
+    <div class="form-group">
+      <label for="lname">@_localizer["Last Name"]</label>
+      <input type="text" class="form-control" id="lname" required>
+    </div>
+    <div class="form-group">
+      <label for="nationalId">@_localizer["National Id"]</label>
+      <input type="text" class="form-control" id="nationalId" required>
+    </div>
+
+    <h4 class="mt-5">@_localizer["Educations"]</h4>
+    <div>
+      <table id="universities" class="table table-condensed table-sm">
+        <thead>
+          <tr>
+            <th scope="col" style="width: 0%;"></th>
+            <th scope="col" style="width: 25%;">@_localizer["University Name"]</th>
+            <th scope="col" style="width: 10%;">@_localizer["Level"]</th>
+            <th scope="col" style="width: 15%;">@_localizer["Major"]</th>
+            <th scope="col" style="width: 15%;">@_localizer["Minor"]</th>
+            <th scope="col" style="width: 10%;">@_localizer["GPA"]</th>
+            <th scope="col" style="width: 12.5%;">@_localizer["Started At"]</th>
+            <th scope="col" style="width: 12.5%;">@_localizer["Finished At"]</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+
+
+
+        </tbody>
+        <tfoot>
+          <tr>
+            <td scope="col">
+              <input type="hidden" name="universityId" id="universityId">
+            </td>
+            <td scope="col">
+              <input type="text" class="form-control dropdown" id="university" placeholder="University Name">
+              <div id="universitiesList" class="dropdown-menu">
+              </div>
+            </td>
+            <td scope="col">
+              @* <select class="form-control" id="level" asp-items="@(Html.GetEnumSelectList<EducationLevel>())">
+
+                </select> *@
+              <select class="form-control" id="level">
+
+                @foreach (var item in Enum.GetNames<EducationLevel>())
+                {
+                  <option>
+                    @item
+                  </option>
+                }
+              </select>
+            </td>
+            <td scope="col">
+              <input type="text" class="form-control" id="major" placeholder="University Major">
+            </td>
+            <td scope="col">
+              <input type="text" class="form-control" id="minor" placeholder="University Minor">
+            </td>
+            <td scope="col">
+              <input type="number" class="form-control" id="gpa" placeholder="GPA">
+            </td>
+            <td scope="col">
+              <input type="text" class="form-control" id="started" placeholder="yyyy/mm/dd" data-slots="ymd"
+                title="Started Like 1382/07/01">
+            </td>
+            <td scope="col">
+              <input type="text" class="form-control" id="finished" placeholder="yyyy/mm/dd" data-slots="ymd"
+                title="Finished Like 1386/07/01">
+            </td>
+            <td>
+              <button type="button" class="btn-secondary" id="AddUniversityLine">Add</button>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+
+    </div>
+
+    <button type="button" id="registerme" class="btn btn-primary mb-2">Register</button>
+  </form>
+</div>
+
+
+
+<div>
+  <div id="universityModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Universities</h5>
+
+        </div>
+        <div class="modal-body">
+
+          <form name="addUniversityForm" method="post">
+            <div class="form-group">
+              <label for="name">University Name</label>
+              <input type="text" class="form-control" id="name" name="name">
+            </div>
+            <div class="form-group">
+              <label for="type">University Type</label>
+              <select class="form-control" id="type" name="type" asp-items="@Html.GetEnumSelectList<UniversityType>()">
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="address">University Address</label>
+              <textarea class="form-control" id="address" name="address" rows="3"></textarea>
+            </div>
+            <button type="button" id="addUni" class="btn btn-primary m-2">Add University</button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+
+<script>
+  $("#addUni").on("click", function () {
+    let type = $("#type").val();
+    let name = $("#name").val();
+    let address = $("#address").val();
+    let model = { type, name, address };
+    console.log(model);
+    if (name == "" || address == "") { return; }
+    var formData = new FormData();
+    formData.append("type", type);
+    formData.append("name", name);
+    formData.append("address", address);
+    $.ajax(
+      {
+        type: "POST",
+        url: "/people/adduniversity",
+        contentType: false,
+        processData: false,
+        data: formData,
+        success: function (dt) {
+          $("#name").val("");
+          $("#address").val("");
+          $("#universityModal").modal("hide")
+        },
+        error: function (xhr, options, err) {
+          window.alert(err);
+          console.log(xhr);
+        },
+      }
+    );
+
+
+
+  })
+</script>
+
+<script>
+  $("#AddUniversityLine").on("click", function () {
+    var universityId = $("#universityId").val();
+    var university = $("#university").val();
+    var level = $("#level").val();
+    var major = $("#major").val();
+    var minor = $("#minor").val();
+    var gpa = $("#gpa").val();
+    var started = $("#started").val();
+    var finished = $("#finished").val();
+    if (university == "" || level == "" || gpa == "") {
+      alert("You should fill all the required filled")
+    } else {
+      $("#universities tbody").append(
+        `<tr>
+        <td style="opacity:0">${universityId}</td>
+        <td>${university}</td>
+        <td>${level}</td>
+        <td>${major}</td>
+        <td>${minor}</td>
+        <td>${gpa}</td>
+        <td>${started}</td>
+        <td>${finished}</td>
+        <td><button class="removeUniversity btn-secondary">Remove</button></td>
+    </tr>`
+      );
+      $("#universityId").val("");
+      $("#university").val("");
+      $("#level").val("");
+      $("#major").val("");
+      $("#minor").val("");
+      $("#gpa").val("");
+      $("#started").val("");
+      $("#finished").val("");
+    }
+  });
+  $("#universities tbody").on("click", ".removeUniversity", function () {
+    $(this).closest("tr").remove();
+  })
+  $("#registerme").on("click", function () {
+    var formData = new FormData();
+    formData.append("firstName", $("#fname").val());
+    formData.append("lastName", $("#lname").val());
+    formData.append("nationalId", $("#nationalId").val());
+    var universityLines = $("#universities tbody tr").map(function () {
+      return {
+        universityId: $(this.cells[0]).text(),
+        level: $(this.cells[2]).text(),
+        major: $(this.cells[3]).text(),
+        minor: $(this.cells[4]).text(),
+        gPA: $(this.cells[5]).text(),
+        startDate: $(this.cells[6]).text(),
+        endDate: $(this.cells[7]).text(),
+      }
+    }).get(); // This return an html element so we should map it to formData
+    $.each(universityLines, function (i, el) {
+      formData.append(`universityLines[${i}].universityId`, el.universityId);
+      formData.append(`universityLines[${i}].level`, el.level);
+      formData.append(`universityLines[${i}].major`, el.major);
+      formData.append(`universityLines[${i}].minor`, el.minor);
+      formData.append(`universityLines[${i}].gPA`, el.gPA);
+      formData.append(`universityLines[${i}].startDate`, el.startDate);
+      formData.append(`universityLines[${i}].endDate`, el.endDate);
+    });
+    $.ajax(
+      {
+        type: "POST",
+        url: "/people/registerme",
+        contentType: false,
+        processData: false,
+        data: formData,
+        success: function (data) {
+          window.location.replace("/people");
+          console.log(data);
+        },
+        error: function (xhr, options, err) {
+          console.log(xhr);
+        },
+      }
+    );
+
+  });
+</script>
+<script>
+  // Search Universitied (On Focus it send an ajax but onchange it works with client side object)
+  var universities = [];
+  $("#university").on("focus", onUniversityFocus);
+  $("#university").on("keyup", onUniversityChange);
+  function onUniversityFocus(ev) {
+    $("#universitiesList").addClass("show");
+    $.ajax({
+      type: "GET",
+      url: "/people/getuniversities",
+      error: function (xhr, opts, err) {
+        console.log(xhr);
+      },
+      success: function (data) {
+        universities = data;
+      }
+    }).done(onUniversityChange);
+  }
+  function onUniversityChange(ev) {
+    let srchString = document.getElementById("university").value;
+    let selectedUniversities = universities.filter((item, idx, arr) => item.name.includes(srchString))
+    let html = selectedUniversities.map((val, idx, arr) => `<a class="dropdown-item university-item" data-value="${val.id}">${val.name}</a>`).join("");
+    html = `<a class="dropdown-item university-add-link bg-success">--Add New University--</a>` + html;
+    document.getElementById("universitiesList").innerHTML = html;
+  }
+  $("#universitiesList").on("click", "a.university-item", function () {
+    @* console.log($(this)); *@
+      $("#universityId").val($(this)[0].dataset.value)
+    $("#university").val($(this).text())
+    $("#universitiesList").removeClass("show");
+  });
+  $("#universitiesList").on("click", "a.university-add-link", function () {
+    $('#universityModal').modal('show');
+  });
+</script>
+}

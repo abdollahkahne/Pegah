@@ -1,0 +1,12 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.participants.timeout": 0,
+    "dotnetAcquisitionExtension.installTimeoutValue": 0,
+    "editor.formatOnSave": true,
+  }
+}

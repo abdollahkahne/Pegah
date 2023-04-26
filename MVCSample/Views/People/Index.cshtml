@@ -1,0 +1,74 @@
+@model IndexViewModel
+@{
+  ViewData["Title"] = "People registered in our system";
+}
+
+<h1>@ViewData["Title"]</h1>
+<div>
+  <form>
+    <div class="row">
+      <div class="col-3">
+        <div class="form-group">
+          <label for="started">Started After</label>
+          <input type="text" class="form-control" asp-for="@Model.Start" placeholder="yyyy/mm/dd" data-slots="ymd"
+            title="Like 1382/07/01">
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="form-group">
+          <label for="finished">Finished Before</label>
+          <input type="text" class="form-control" asp-for="@Model.Finish" placeholder="yyyy/mm/dd" data-slots="ymd"
+            title="Like 1382/07/01">
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="form-group">
+          <label for="fullname">Full Name</label>
+          <input type="text" asp-for="@Model.Fullname" class="form-control" placeholder="Full Name">
+        </div>
+      </div>
+      <div class="col">
+        <div class="form-group">
+          <label for="nationalId">National Id</label>
+          <input asp-for="@Model.NationalId" type="text" class="form-control" placeholder="National Id">
+        </div>
+      </div>
+      <div class="col">
+        <br>
+        <button class="btn-primary" type="submit">Search</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Full Name</th>
+        <th scope="col">National Id</th>
+        <th scope="col">Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      @{
+        int ctr = 0;
+      }
+      @foreach (var item in Model.People)
+      {
+        ctr++;
+        <tr>
+          <th scope="row">@ctr</th>
+          <td><a href="@("/people/display/"+item.Id)">@item.FirstName @item.LastName</a></td>
+          <td>@item.NationalId</td>
+          <td>@item.Created</td>
+        </tr>
+      }
+
+
+    </tbody>
+  </table>
+
+</div>
